@@ -1,6 +1,12 @@
 
 class Observable(object):
+    count = 0
+
     def __init__(self):
+        self._id = Observable.count
+        Observable.count += 1
+        self._name = "Observable {}".format(self._id)
+
         self._listeners = []
         self._state = True
         # also call method to trigger callbacks
@@ -10,7 +16,9 @@ class Observable(object):
         return self._state
 
     def set_state(self, state):
+        #print("setting state of {} to {}, {}".format(self._name, state, self))
         if state != self._state:
+            #print("actually set")
             self._state = state
             self._notify_listeners()
 
@@ -23,12 +31,17 @@ class Observable(object):
 
 
 class Switch(Observable):
-    pass
+    def __init__(self):
+        super(Switch, self).__init__()
+
+        self._name = "Switch"
 
 
 class Gate(Observable):
     def __init__(self, inputs=None):
         super(Gate, self).__init__()
+        self._name = "Gate"
+
         self._inputs = inputs if inputs is not None else []
         for input_ in self._inputs:
             input_.register_listener(self._callback)
@@ -47,6 +60,15 @@ class Gate(Observable):
 
 
 class Not(Gate):
+    count = 0
+
+    def __init__(self, inputs=[]):
+        super(Not, self).__init__(inputs)
+
+        self._id = Not.count
+        Not.count += 1
+        self._name = "Not {}".format(self._id)
+
     def _callback(self):
         self.set_state(not self._inputs[0].get_state())
 
@@ -60,6 +82,15 @@ class And(Gate):
 
 
 class Or(Gate):
+    count = 0
+
+    def __init__(self, inputs=[]):
+        super(Or, self).__init__(inputs)
+
+        self._id = Or.count
+        Or.count += 1
+        self._name = "Or {}".format(self._id)
+
     def _callback(self):
         temp_state = False
         for input_ in self._inputs:
@@ -80,10 +111,22 @@ class Nand(Gate):
 
 
 class Nor(Gate):
+    count = 0
+
     def __init__(self, inputs=[]):
         self._or = Or(inputs=inputs)
         self._not = Not(inputs=[self._or])
         super(Nor, self).__init__(inputs)
+        self._id = Nor.count
+        Nor.count += 1
+        self._name = "Nor {}".format(self._id)
+
+    def add_input(self, new_input):
+        self._or.add_input(new_input)
+        super(Nor, self).add_input(new_input)
+        #self._inputs.append(new_input)
+        #new_input.register_listener(self._callback)
+        #self._callback()
 
     def _callback(self):
         new_state = self._not.get_state()
@@ -91,11 +134,19 @@ class Nor(Gate):
 
 
 class SRLatch(Gate):
+    count = 0
+
     def __init__(self, inputs=[]):
         super(SRLatch, self).__init__(inputs)
+        self._id = SRLatch.count
+        SRLatch.count +=1
+        self._name = "SRLatch {}".format(self._id)
 
         self._nor0 = Nor(inputs=[inputs[0]])
         self._nor1 = Nor(inputs=[inputs[1]])
+
+        print("nor0 init: {}".format(self._nor0.get_state()))
+        print("nor1 init: {}".format(self._nor0.get_state()))
 
         self._nor0.add_input(self._nor1)
         self._nor1.add_input(self._nor0)
