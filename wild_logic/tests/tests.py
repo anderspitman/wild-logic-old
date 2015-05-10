@@ -1,7 +1,11 @@
 
 from unittest import TestCase, main
 
+import sys
+sys.path.append("../")
 from gates import *
+from latches import *
+from core import *
 
 class TestObservable(TestCase):
 
