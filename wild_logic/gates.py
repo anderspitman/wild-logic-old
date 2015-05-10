@@ -95,11 +95,3 @@ class Nor(Gate):
     def _callback(self):
         new_state = self._not.get_state()
         self.set_state(self._not.get_state())
-
-
-class TruthTableException(Exception):
-    def __init__(self, message):
-        super(TruthTableException, self).__init__(message)
-
-
-

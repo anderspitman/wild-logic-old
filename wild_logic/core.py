@@ -36,6 +36,12 @@ class Switch(Observable):
 
         self._name = "Switch"
 
+
+class TruthTableException(Exception):
+    def __init__(self, message):
+        super(TruthTableException, self).__init__(message)
+
+
 def verify_logic(gate_class, truth_table):
     num_columns = len(truth_table.keys()[0])
     switches = [ Switch() for x in range(num_columns) ]
@@ -50,5 +56,3 @@ def verify_logic(gate_class, truth_table):
                                                            gate.get_state()))
             return False
     return True
-
-
