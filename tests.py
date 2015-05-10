@@ -204,7 +204,7 @@ class TestSRLatch(TestCase):
     def test_sr_latch(self):
         r = Switch()
         s = Switch()
-        latch = SRLatch(inputs=[r,s])
+        latch = SRLatch(r, s)
         s.set_state(True)
         r.set_state(False)
         self.assertTrue(latch.get_output('Q'))
@@ -213,6 +213,30 @@ class TestSRLatch(TestCase):
         r.set_state(False)
         self.assertTrue(latch.get_output('Q'))
         self.assertFalse(latch.get_output('Q_not'))
+        r.set_state(True)
+        self.assertFalse(latch.get_output('Q'))
+        self.assertTrue(latch.get_output('Q_not'))
+
+
+class TestGatedSRLatch(TestCase):
+    def test_gated_sr_latch(self):
+        s, r, en = [ Switch() for x in range(3) ]
+        latch = GatedSRLatch(s, r, en)
+        en.set_state(True)
+        r.set_state(False)
+        s.set_state(True)
+        self.assertTrue(latch.get_output('Q'))
+        self.assertFalse(latch.get_output('Q_not'))
+        en.set_state(False)
+        s.set_state(False)
+        r.set_state(True)
+        self.assertTrue(latch.get_output('Q'))
+        self.assertFalse(latch.get_output('Q_not'))
+        s.set_state(True)
+        r.set_state(True)
+        s.set_state(False)
+        r.set_state(False)
+        en.set_state(True)
         r.set_state(True)
         self.assertFalse(latch.get_output('Q'))
         self.assertTrue(latch.get_output('Q_not'))
