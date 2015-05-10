@@ -1,81 +1,57 @@
 
-class Link(object):
+class Observable(object):
     def __init__(self):
-        self._state = False
-        self._callback = None
+        self._listeners = []
+        self.set_state(False)
 
     def get_state(self):
         return self._state
 
     def set_state(self, state):
         self._state = state
-        if self._callback:
-            self._callback(self._state)
+        self._notify_listeners()
 
-    def set_callback(self, callback):
-        self._callback = callback
+    def register_listener(self, listener):
+        self._listeners.append(listener)
+
+    def _notify_listeners(self):
+        for listener in self._listeners:
+            listener(self._state)
 
 
-class Gate(object):
+class Switch(Observable):
+    pass
+
+
+class Gate(Observable):
+    def __init__(self, inputs=[]):
+        super(Gate, self).__init__()
+        self._inputs = inputs
+        for input_ in inputs:
+            input_.register_listener(self._callback)
+            self._callback(input_.get_state())
+
     def _callback(self, state):
         pass
 
 
-class OneInputGate(Gate):
-    def __init__(self, newIn=None, out=None):
-        self._in = newIn if newIn is not None else Link()
-        self._in.set_callback(self._callback)
-        self._out = out if out is not None else Link()
-
-
-    def get_in(self):
-        return self._in
-
-    def get_out(self):
-        return self._out
-
-
-class Buffer(OneInputGate):
+class Not(Gate):
     def _callback(self, state):
-        self._out.set_state(self._in.get_state())
+        self.set_state(not state)
 
 
-class Not(OneInputGate):
+class And(Gate):
     def _callback(self, state):
-        self.get_out().set_state(not self.get_in().get_state())
+        temp_state = state
+        for x in self._inputs:
+            temp_state = temp_state and x.get_state()
+        self.set_state(temp_state)
 
 
-class TwoInputGate(Gate):
-    def __init__(self, in1=None, in2=None, out=None):
-        self._in1 = in1 if in1 is not None else Link()
-        self._in2 = in2 if in2 is not None else Link()
-        self._out = out if out is not None else Link()
-        self._in1.set_callback(self._callback)
-        self._in2.set_callback(self._callback)
-
-    def get_out(self):
-        return self._out
-
-    def get_in1(self):
-        return self._in1
-        
-    def set_in1(self, in1):
-        self._in1 = in1
-
-    def get_in2(self):
-        return self._in2
-
-    def set_in2(self, in2):
-        self._in2 = in2
-
-
-class Or(TwoInputGate):
+class Or(Gate):
     def _callback(self, state):
-        self._out.set_state(self.get_in1().get_state() or 
-                            self.get_in2().get_state())
-
-
-class And(TwoInputGate):
-    def _callback(self, state):
-        self._out.set_state(self._in1.get_state() and self._in2.get_state())
+        for input_ in self._inputs:
+            if input_.get_state():
+                self.set_state(True)
+                break
 
