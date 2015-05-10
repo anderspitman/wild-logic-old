@@ -106,6 +106,10 @@ class Nand(Gate):
         self._not = Not(inputs=[self._and])
         super(Nand, self).__init__(inputs)
 
+    def add_input(self, new_input):
+        self._and.add_input(new_input)
+        super(Nand, self).add_input(new_input)
+
     def _callback(self):
         self.set_state(self._not.get_state())
 
@@ -124,9 +128,6 @@ class Nor(Gate):
     def add_input(self, new_input):
         self._or.add_input(new_input)
         super(Nor, self).add_input(new_input)
-        #self._inputs.append(new_input)
-        #new_input.register_listener(self._callback)
-        #self._callback()
 
     def _callback(self):
         new_state = self._not.get_state()

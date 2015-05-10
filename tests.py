@@ -140,6 +140,15 @@ class TestNand(TestCase):
         }
         self.assertTrue(verify_logic(Nand, truth_table))
 
+    def test_add_input(self):
+        switches = [ Switch() for x in range(3) ]
+        map(lambda x: x.set_state(True), switches)
+        gate = Nand(switches[0:2])
+        self.assertFalse(gate.get_state())
+        gate.add_input(switches[2])
+        switches[2].set_state(False)
+        self.assertTrue(gate.get_state())
+
 
 class TestNor(TestCase):
     def test_truth_table(self):
@@ -150,6 +159,15 @@ class TestNor(TestCase):
             (1 ,1) : 0
         }
         self.assertTrue(verify_logic(Nor, truth_table))
+
+    def test_add_input(self):
+        switches = [ Switch() for x in range(3) ]
+        map(lambda x: x.set_state(False), switches)
+        gate = Nor(switches[0:2])
+        self.assertTrue(gate.get_state())
+        gate.add_input(switches[2])
+        switches[2].set_state(True)
+        self.assertFalse(gate.get_state())
 
 
 class TestGate(TestCase):
