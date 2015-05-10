@@ -129,6 +129,7 @@ class TestOr(TestCase):
         switches[0].set_state(False)
         self.assertFalse(gate.get_state())
 
+
 class TestNand(TestCase):
     def test_truth_table(self):
         truth_table = {
@@ -151,6 +152,26 @@ class TestNor(TestCase):
         self.assertTrue(verify_logic(Nor, truth_table))
 
 
+class TestGate(TestCase):
+    def test_add_input(self):
+        gate = Not()
+        self.assertEquals(0, len(gate.get_inputs()))
+        switch = Switch()
+        gate.add_input(switch)
+        self.assertEquals(1, len(gate.get_inputs()))
+        self.assertTrue(switch in gate.get_inputs())
+
+    def test_add_input_registers_listener(self):
+        # using not gate since it's simple but has callback
+        switch = Switch()
+        gate = Not([switch])
+        gate.add_input(switch)
+        switch.set_state(False)
+        self.assertTrue(gate.get_state())
+        switch.set_state(True)
+        self.assertFalse(gate.get_state())
+
+
 class TestVerifier(TestCase):
     def test_verifier(self):
         truth_table = {
@@ -160,6 +181,16 @@ class TestVerifier(TestCase):
             (1 ,1) : 1
         }
         self.assertTrue(verify_logic(And, truth_table))
+
+class TestSRLatch(TestCase):
+    def test_sr_latch(self):
+        r = Switch()
+        s = Switch()
+        latch = SRLatch(inputs=[r,s])
+        self.assertTrue(latch.get_output('Q'))
+        #self.assertFalse(latch.get_output('Q_not'))
+        #r.set_state(True)
+        #self.assertFalse(latch.get_output('Q'))
 
 
 if __name__ == '__main__':

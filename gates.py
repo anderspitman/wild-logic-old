@@ -2,14 +2,17 @@
 class Observable(object):
     def __init__(self):
         self._listeners = []
+        self._state = True
+        # also call method to trigger callbacks
         self.set_state(False)
 
     def get_state(self):
         return self._state
 
     def set_state(self, state):
-        self._state = state
-        self._notify_listeners()
+        if state != self._state:
+            self._state = state
+            self._notify_listeners()
 
     def register_listener(self, listener):
         self._listeners.append(listener)
@@ -24,12 +27,20 @@ class Switch(Observable):
 
 
 class Gate(Observable):
-    def __init__(self, inputs=[]):
+    def __init__(self, inputs=None):
         super(Gate, self).__init__()
-        self._inputs = inputs
-        for input_ in inputs:
+        self._inputs = inputs if inputs is not None else []
+        for input_ in self._inputs:
             input_.register_listener(self._callback)
             self._callback()
+
+    def add_input(self, new_input):
+        self._inputs.append(new_input)
+        new_input.register_listener(self._callback)
+        self._callback()
+
+    def get_inputs(self):
+        return self._inputs
 
     def _callback(self):
         raise Exception("Abstract method _callback not implemented")
@@ -75,7 +86,36 @@ class Nor(Gate):
         super(Nor, self).__init__(inputs)
 
     def _callback(self):
+        new_state = self._not.get_state()
         self.set_state(self._not.get_state())
+
+
+class SRLatch(Gate):
+    def __init__(self, inputs=[]):
+        super(SRLatch, self).__init__(inputs)
+
+        self._nor0 = Nor(inputs=[inputs[0]])
+        self._nor1 = Nor(inputs=[inputs[1]])
+
+        self._nor0.add_input(self._nor1)
+        self._nor1.add_input(self._nor0)
+
+    def get_output(self, name):
+        if name == 'Q':
+            return self._nor0.get_state()
+        elif name == 'Q_not':
+            return self._nor1.get_state()
+        else:
+            raise Exception("invalid SR latch output name")
+
+    def _callback(self):
+        pass
+
+
+
+
+
+
 
 class TruthTableException(Exception):
     def __init__(self, message):
