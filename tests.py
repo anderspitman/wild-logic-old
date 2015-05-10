@@ -7,14 +7,12 @@ class TestObservable(TestCase):
 
     def test_listeners(self):
         obs = Observable()
-        callback0_data = { 'called': False, 'state': False }
-        callback1_data = { 'called': False, 'state': False }
-        def callback0(state):
+        callback0_data = { 'called': False }
+        callback1_data = { 'called': False }
+        def callback0():
             callback0_data['called'] = True
-            callback0_data['state'] = state
-        def callback1(state):
+        def callback1():
             callback1_data['called'] = True
-            callback1_data['state'] = state
         obs.register_listener(callback0)
         obs.register_listener(callback1)
         obs._notify_listeners()
@@ -22,6 +20,15 @@ class TestObservable(TestCase):
         self.assertTrue(callback1_data['called'])
 
 class TestAnd(TestCase):
+    def test_truth_table(self):
+        truth_table = {
+            (0, 0) : 0,
+            (0, 1) : 0,
+            (1, 0) : 0,
+            (1 ,1) : 1
+        }
+        self.assertTrue(verify_logic(And, truth_table))
+
     def test_and(self):
         switches = [ Switch() for x in range(2) ]
         gate = And(inputs=switches)
@@ -40,6 +47,13 @@ class TestAnd(TestCase):
 class TestNot(TestCase):
     def setUp(self):
         self.switch = Switch()
+
+    def test_truth_table(self):
+        truth_table = {
+            (0,) : 1,
+            (1,) : 0
+        }
+        self.assertTrue(verify_logic(Not, truth_table))
 
     def test_not_switch_start_false(self):
         self.switch.set_state(False)
@@ -64,10 +78,9 @@ class TestNot(TestCase):
 
 class TestSwitch(TestCase):
     def setUp(self):
-        self.callback_data = { 'called': False, 'state': False }
-        def callback(state):
+        self.callback_data = { 'called': False }
+        def callback():
             self.callback_data['called'] = True
-            self.callback_data['state'] = state
         self.callback = callback
 
     def test_switch(self):
@@ -81,10 +94,8 @@ class TestSwitch(TestCase):
         switch.register_listener(self.callback)
         switch.set_state(True)
         self.assertTrue(self.callback_data['called'])
-        self.assertTrue(self.callback_data['state'])
         switch.set_state(False)
         self.assertTrue(self.callback_data['called'])
-        self.assertFalse(self.callback_data['state'])
 
     def test_switch_to_and(self):
         switch0 = Switch()
@@ -100,6 +111,15 @@ class TestSwitch(TestCase):
 
 
 class TestOr(TestCase):
+    def test_truth_table(self):
+        truth_table = {
+            (0, 0) : 0,
+            (0, 1) : 1,
+            (1, 0) : 1,
+            (1 ,1) : 1
+        }
+        self.assertTrue(verify_logic(Or, truth_table))
+
     def test_or(self):
         switches = [ Switch() for x in range(2) ]
         gate = Or(inputs=switches)
@@ -108,6 +128,39 @@ class TestOr(TestCase):
         self.assertTrue(gate.get_state())
         switches[0].set_state(False)
         self.assertFalse(gate.get_state())
+
+class TestNand(TestCase):
+    def test_truth_table(self):
+        truth_table = {
+            (0, 0) : 1,
+            (0, 1) : 1,
+            (1, 0) : 1,
+            (1 ,1) : 0
+        }
+        self.assertTrue(verify_logic(Nand, truth_table))
+
+
+class TestNor(TestCase):
+    def test_truth_table(self):
+        truth_table = {
+            (0, 0) : 1,
+            (0, 1) : 0,
+            (1, 0) : 0,
+            (1 ,1) : 0
+        }
+        self.assertTrue(verify_logic(Nor, truth_table))
+
+
+class TestVerifier(TestCase):
+    def test_verifier(self):
+        truth_table = {
+            (0, 0) : 0,
+            (0, 1) : 0,
+            (1, 0) : 0,
+            (1 ,1) : 1
+        }
+        self.assertTrue(verify_logic(And, truth_table))
+
 
 if __name__ == '__main__':
     main()
