@@ -1,5 +1,6 @@
 from core import Observable, Switch
 
+
 class Gate(Observable):
     def __init__(self, inputs=None):
         super(Gate, self).__init__()

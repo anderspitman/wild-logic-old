@@ -1,11 +1,11 @@
 
 from unittest import TestCase, main
-
 import sys
 sys.path.append("../")
 from gates import *
 from latches import *
 from core import *
+
 
 class TestObservable(TestCase):
 
@@ -22,6 +22,7 @@ class TestObservable(TestCase):
         obs._notify_listeners()
         self.assertTrue(callback0_data['called'])
         self.assertTrue(callback1_data['called'])
+
 
 class TestAnd(TestCase):
     def test_truth_table(self):
@@ -47,6 +48,7 @@ class TestAnd(TestCase):
         self.assertFalse(gate2.get_state())
         map(lambda x: x.set_state(True), switches)
         self.assertTrue(gate2.get_state())
+
 
 class TestNot(TestCase):
     def setUp(self):
@@ -242,6 +244,25 @@ class TestGatedSRLatch(TestCase):
         r.set_state(False)
         en.set_state(True)
         r.set_state(True)
+        self.assertFalse(latch.get_output('Q'))
+        self.assertTrue(latch.get_output('Q_not'))
+
+class TestGatedDLatch(TestCase):
+    def test_gated_d_latch(self):
+        d, en = [ Switch() for x in range(2) ]
+        latch = GatedDLatch(d, en)
+        en.set_state(True)
+        d.set_state(False)
+        self.assertFalse(latch.get_output('Q'))
+        self.assertTrue(latch.get_output('Q_not'))
+        d.set_state(True)
+        self.assertTrue(latch.get_output('Q'))
+        self.assertFalse(latch.get_output('Q_not'))
+        en.set_state(False)
+        self.assertTrue(latch.get_output('Q'))
+        self.assertFalse(latch.get_output('Q_not'))
+        en.set_state(True)
+        d.set_state(False)
         self.assertFalse(latch.get_output('Q'))
         self.assertTrue(latch.get_output('Q_not'))
 
