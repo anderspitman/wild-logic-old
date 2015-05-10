@@ -105,7 +105,9 @@ class TestOr(TestCase):
         gate = Or(inputs=switches)
         self.assertFalse(gate.get_state())
         switches[0].set_state(True)
-        #self.assertTrue(gate.get_state())
+        self.assertTrue(gate.get_state())
+        switches[0].set_state(False)
+        self.assertFalse(gate.get_state())
 
 if __name__ == '__main__':
     main()

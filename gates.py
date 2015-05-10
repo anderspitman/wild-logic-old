@@ -50,8 +50,10 @@ class And(Gate):
 
 class Or(Gate):
     def _callback(self, state):
+        temp_state = False
         for input_ in self._inputs:
             if input_.get_state():
-                self.set_state(True)
+                temp_state = True
                 break
+        self.set_state(temp_state)
 
