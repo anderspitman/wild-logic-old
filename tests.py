@@ -187,10 +187,17 @@ class TestSRLatch(TestCase):
         r = Switch()
         s = Switch()
         latch = SRLatch(inputs=[r,s])
+        s.set_state(True)
+        r.set_state(False)
         self.assertTrue(latch.get_output('Q'))
-        #self.assertFalse(latch.get_output('Q_not'))
-        #r.set_state(True)
-        #self.assertFalse(latch.get_output('Q'))
+        self.assertFalse(latch.get_output('Q_not'))
+        s.set_state(False)
+        r.set_state(False)
+        self.assertTrue(latch.get_output('Q'))
+        self.assertFalse(latch.get_output('Q_not'))
+        r.set_state(True)
+        self.assertFalse(latch.get_output('Q'))
+        self.assertTrue(latch.get_output('Q_not'))
 
 
 if __name__ == '__main__':
