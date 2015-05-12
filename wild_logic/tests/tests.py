@@ -267,5 +267,48 @@ class TestGatedDLatch(TestCase):
         self.assertTrue(latch.get_output('Q_not'))
 
 
+class TestClock(TestCase):
+    def test(self):
+        callback_data = { 'called': False }
+        def callback():
+            callback_data['called'] = True
+        clock = Clock()
+        clock.register_listener(callback)
+
+        self.assertEquals(0, clock.time())
+        clock.tick()
+        self.assertEquals(1, clock.time())
+        self.assertTrue(callback_data['called'])
+        clock.tick(10)
+        self.assertEquals(11, clock.time())
+
+
+class TestTimedNot(TestCase):
+    def test_clocked_not(self):
+        switch = Switch()
+        clock = Clock()
+        gate = DelayedNot(clock, [switch])
+        clock.tick(20)
+        self.assertTrue(gate.get_state())
+        switch.set_state(True)
+        self.assertTrue(gate.get_state())
+        clock.tick(11)
+        self.assertFalse(gate.get_state())
+
+
+class TestDelayedAnd(TestCase):
+    def test_delayed_and(self):
+        switches = [ Switch() for x in range(2) ]
+        clock = Clock()
+        gate = DelayedAnd(clock, switches)
+        self.assertFalse(gate.get_state())
+        map(lambda x: x.set_state(True), switches)
+        self.assertFalse(gate.get_state())
+        clock.tick(10)
+        self.assertFalse(gate.get_state())
+        clock.tick(1)
+        self.assertTrue(gate.get_state())
+
+
 if __name__ == '__main__':
     main()

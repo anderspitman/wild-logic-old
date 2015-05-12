@@ -37,6 +37,53 @@ class Not(Gate):
         self.set_state(not self._inputs[0].get_state())
 
 
+class Clock(Observable):
+    def __init__(self):
+        self._time = 0
+        super(Clock, self).__init__()
+
+    def time(self):
+        return self._time
+
+    def tick(self, num_ticks=1):
+        self._time += num_ticks
+        self._notify_listeners()
+
+
+class DelayedGate(Gate):
+    def __init__(self, clock=None, inputs=[]):
+        self._clock = clock if clock is not None else Clock()
+        super(DelayedGate, self).__init__(inputs)
+
+        self._time = 0
+        self._trigger_time = 0
+        self._propagation_delay = 10
+        self._clock.register_listener(self._clock_callback)
+
+    def _callback(self):
+        self._trigger_time = self._clock.time()
+        self._triggered = True
+
+    def _clock_callback(self):
+        if self._triggered and self._clock.time() - \
+            self._propagation_delay > self._trigger_time:
+            self.set_state(self._evaluate())
+            self._triggered = False
+
+
+class DelayedNot(DelayedGate):
+    def _evaluate(self):
+        return not self._inputs[0].get_state()
+
+
+class DelayedAnd(DelayedGate):
+    def _evaluate(self):
+        temp_state = True
+        for x in self._inputs:
+            temp_state = temp_state and x.get_state()
+        return temp_state
+
+
 class And(Gate):
     def _callback(self):
         temp_state = True
