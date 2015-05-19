@@ -8,7 +8,7 @@ function Switch() {
 
 Switch.prototype.setState = function(state) {
   this.state = state;
-  this.subject.onNext();
+  this.subject.onNext(this.state);
 }
 
 
@@ -20,8 +20,8 @@ Probe.prototype.getState = function() {
   return this.state;
 }
 
-Probe.prototype.callback = function(data) {
-  this.state = true;
+Probe.prototype.callback = function(state) {
+  this.state = state;
 }
 
 function connectOutputToInput(output, input) {

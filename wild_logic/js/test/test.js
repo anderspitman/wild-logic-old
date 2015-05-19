@@ -28,7 +28,25 @@ describe('Core tests', function(){
   describe('Test probe class', function() {
     it('Initially false', function() {
       probe = new Probe();
-      assert.equal(false, probe.getState());
+      assert.equal(probe.getState(), false);
+    }),
+
+    it("Set to true", function() {
+      probe = new Probe();
+      test_switch = new Switch();
+      connectOutputToInput(test_switch, probe);
+      test_switch.setState(true);
+      assert.equal(probe.getState(), true);
+    }),
+
+    it("Set to true then false", function() {
+      probe = new Probe();
+      test_switch = new Switch();
+      connectOutputToInput(test_switch, probe);
+      test_switch.setState(true);
+      assert.equal(probe.getState(), true);
+      test_switch.setState(false);
+      assert.equal(probe.getState(), false);
     })
   })
 
