@@ -6,17 +6,8 @@ function Switch() {
   this.subject = new Rx.Subject();
 }
 
-Switch.prototype.getState = function() {
-  return this.state;
-};
-
-Switch.prototype.set_state = function(state) {
+Switch.prototype.setState = function(state) {
   this.state = state;
-  this.subject.onNext();
-};
-
-Switch.prototype.toggle = function() {
-  this.state = !this.state;
   this.subject.onNext();
 }
 

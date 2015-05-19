@@ -8,19 +8,18 @@ connectOutputToInput = core.connectOutputToInput;
 describe('Core tests', function(){
   
   describe('Test switch class', function() {
-    it('Basic functionality', function() {
+    it('Init to false', function() {
       test_switch = new Switch();
-      assert.equal(false, test_switch.getState());
-      test_switch.toggle();
-      assert.equal(true, test_switch.getState());
+      probe = new Probe();
+      connectOutputToInput(test_switch, probe);
+      assert.equal(probe.getState(), false);
     }),
 
-    it('Listeners', function() {
+    it('Set state', function() {
       probe = new Probe();
       test_switch = new Switch();
       connectOutputToInput(test_switch, probe);
-      assert.equal(probe.getState(), false);
-      test_switch.toggle();
+      test_switch.setState(true);
       assert.equal(probe.getState(), true);
     })
 
