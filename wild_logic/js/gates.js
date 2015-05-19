@@ -1,5 +1,14 @@
 var core = require('./core');
-Switch = core.Switch;
+var Rx = require('rx');
 
-s = new Switch();
-console.log(s.get_state());
+function Not() {
+  this.state = false;
+  this.subject = new Rx.Subject();
+}
+
+Not.prototype.callback = function(state) {
+  this.state = !state;
+  this.subject.onNext(this.state);
+}
+
+module.exports.Not = Not;

@@ -25,7 +25,10 @@ Probe.prototype.callback = function(state) {
 }
 
 function connectOutputToInput(output, input) {
-  output.subject.subscribe(input.callback.bind(input));
+  var callback = input.callback.bind(input)
+  output.subject.subscribe(callback);
+  // ensure input starts with correct value
+  callback(output.state);
 }
 
 module.exports.Switch = Switch;

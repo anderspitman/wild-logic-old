@@ -1,9 +1,12 @@
-var assert = require("assert")
-var core = require("../core")
+var assert = require("assert");
+var core = require("../core");
+var gates = require("../gates");
 
 Switch = core.Switch;
 Probe = core.Probe;
 connectOutputToInput = core.connectOutputToInput;
+
+Not = gates.Not;
 
 describe('Core tests', function(){
   
@@ -46,6 +49,44 @@ describe('Core tests', function(){
       test_switch.setState(true);
       assert.equal(probe.getState(), true);
       test_switch.setState(false);
+      assert.equal(probe.getState(), false);
+    })
+  }),
+
+  describe('Test connectOutputToInput', function() {
+    it('Propagate values when first connected', function() {
+      testSwitch = new Switch();
+      probe = new Probe();
+      testSwitch.setState(true);
+      connectOutputToInput(testSwitch, probe);
+      assert.equal(probe.getState(), true);
+    })
+  }),
+
+  describe('Test not gate', function() {
+    var testSwitch;
+    var not;
+    var probe;
+
+    beforeEach(function() {
+      testSwitch = new Switch();
+      not = new Not();
+      probe = new Probe();
+      connectOutputToInput(testSwitch, not);
+      connectOutputToInput(not, probe);
+    }),
+
+    it('Init to true', function() {
+      assert.equal(probe.getState(), true);
+    }),
+
+    it('False to true', function() {
+      testSwitch.setState(false);
+      assert.equal(probe.getState(), true);
+    }),
+
+    it('True to false', function() {
+      testSwitch.setState(true);
       assert.equal(probe.getState(), false);
     })
   })
