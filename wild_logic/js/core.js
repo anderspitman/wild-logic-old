@@ -24,15 +24,15 @@ Probe.prototype.callback = function(state) {
   this.state = state;
 }
 
-function connectOutputToInput(output, input) {
-  var callback = input.callback.bind(input)
-  output.subject.subscribe(callback);
+function connectPublisherToSubscriber(publisher, subscriber) {
+  var callback = subscriber.callback.bind(subscriber);
+  publisher.subject.subscribe(callback);
   // ensure input starts with correct value
-  callback(output.state);
+  callback(publisher.state);
 }
 
 module.exports.Switch = Switch;
 module.exports.Probe = Probe;
-module.exports.connectOutputToInput = connectOutputToInput;
+module.exports.connectPublisherToSubscriber = connectPublisherToSubscriber;
 
 
