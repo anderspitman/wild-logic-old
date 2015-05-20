@@ -12,23 +12,44 @@ Not.prototype.callback = function(state) {
 }
 
 
-function And() {
-  this.state = false;
+function Gate() {
   this.inputs = [];
+  this.outputs = [];
+  this.state = false;
   this.subject = new Rx.Subject();
 }
 
-And.prototype.addInput = function(input) {
+Gate.prototype.addInput = function(input) {
   this.inputs.push(input);
   var callback = this.callback.bind(this);
   input.subject.subscribe(callback);
   callback(input.state);
 }
 
-And.prototype.callback = function(state) {
+Gate.prototype.addOutput = function(output) {
+  this.outputs.push(output);
+  var callback = output.callback.bind(output);
+  this.subject.subscribe(callback);
+  callback(this.state);
+}
+
+Gate.prototype.callback = function(state) {
   this.state = this.evaluate();
   this.subject.onNext(this.state);
 }
+
+Gate.prototype.evaluate = function() {
+  throw "Abstract method evaluate not implemented";
+}
+
+
+function And() {
+  Gate.call(this);
+}
+
+And.prototype = Object.create(Gate.prototype);
+
+And.prototype.constructor = And;
 
 And.prototype.evaluate = function() {
   var value = true;
@@ -42,22 +63,12 @@ And.prototype.evaluate = function() {
 
 
 function Or() {
-  this.state = false;
-  this.inputs = [];
-  this.subject = new Rx.Subject();
+  Gate.call(this);
 }
 
-Or.prototype.addInput = function(input) {
-  this.inputs.push(input);
-  var callback = this.callback.bind(this);
-  input.subject.subscribe(callback);
-  callback(input.state);
-}
+Or.prototype = Object.create(Gate.prototype);
 
-Or.prototype.callback = function(state) {
-  this.state = this.evaluate();
-  this.subject.onNext(this.state);
-}
+Or.prototype.constructor = Or;
 
 Or.prototype.evaluate = function() {
   var value = false;
@@ -68,6 +79,7 @@ Or.prototype.evaluate = function() {
   });
   return value;
 }
+
 
 module.exports.Not = Not;
 module.exports.And = And;

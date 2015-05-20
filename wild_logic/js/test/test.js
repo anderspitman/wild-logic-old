@@ -131,7 +131,63 @@ describe('Core tests', function(){
       assert.equal(probe.getState(), true);
       switches[0].setState(false);
       assert.equal(probe.getState(), false);
+    }),
+
+    it("3 input AND", function() {
+      sw = new Switch();
+      switches.push(sw);
+      and.addInput(sw);
+      switches.forEach(function(sw) {
+        sw.setState(false);
+      });
+      assert.equal(probe.getState(), false);
+      switches[0].setState(true);
+      assert.equal(probe.getState(), false);
+      switches[1].setState(true);
+      assert.equal(probe.getState(), false);
+      switches[2].setState(true);
+      assert.equal(probe.getState(), true);
+    }),
+
+    it("Chained ANDs", function() {
+      probe = new Probe();
+      switches.push(new Switch());
+      switches.push(new Switch());
+      switches.forEach(function(sw) {
+        sw.setState(false);
+      });
+      and0 = new And();
+      and0.addInput(switches[0]);
+      and0.addInput(switches[1]);
+      and1 = new And();
+      and1.addInput(switches[2]);
+      and1.addInput(switches[3]);
+      and2 = new And();
+      and2.addInput(and0);
+      and2.addInput(and1);
+      connectPublisherToSubscriber(and2, probe);
+      assert.equal(probe.getState(), false);
+      switches.forEach(function(sw) {
+        sw.setState(true);
+      });
+      assert.equal(probe.getState(), true);
+      switches[2].setState(false);
+      assert.equal(probe.getState(), false);
+    }),
+
+    it("addOutput", function() {
+      newProbe = new Probe();
+      and.addOutput(newProbe);
+      assert.equal(newProbe.getState(), false);
+      switches.forEach(function(sw) {
+        sw.setState(true);
+      });
+      assert.equal(newProbe.getState(), true);
+      switches[1].setState(false);
+      assert.equal(newProbe.getState(), false);
     })
+
+
 
     //it("Adding same input twice fails", function() {
     //  try {
