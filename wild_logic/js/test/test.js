@@ -4,7 +4,6 @@ var gates = require("../gates");
 
 Switch = core.Switch;
 Probe = core.Probe;
-connectPublisherToSubscriber = core.connectPublisherToSubscriber;
 
 Not = gates.Not;
 And = gates.And;
@@ -14,18 +13,24 @@ describe('Core tests', function(){
   
   describe('Test switch class', function() {
     it('Init to false', function() {
-      var test_switch = new Switch();
+      var testSwitch = new Switch();
       var probe = new Probe();
-      connectPublisherToSubscriber(test_switch, probe);
+      testSwitch.addOutput(probe);
       assert.equal(probe.getState(), false);
     }),
 
     it('Set state', function() {
       var probe = new Probe();
-      var test_switch = new Switch();
-      connectPublisherToSubscriber(test_switch, probe);
-      test_switch.setState(true);
+      var testSwitch = new Switch();
+      testSwitch.addOutput(probe);
+      testSwitch.setState(true);
       assert.equal(probe.getState(), true);
+    }),
+
+    it('addOutput', function() {
+      var testSwitch = new Switch();
+      var probe = new Probe();
+      testSwitch.addOutput(probe);
     })
 
   }),
@@ -38,30 +43,20 @@ describe('Core tests', function(){
 
     it("Set to true", function() {
       var probe = new Probe();
-      var test_switch = new Switch();
-      connectPublisherToSubscriber(test_switch, probe);
-      test_switch.setState(true);
+      var testSwitch = new Switch();
+      testSwitch.addOutput(probe);
+      testSwitch.setState(true);
       assert.equal(probe.getState(), true);
     }),
 
     it("Set to true then false", function() {
       var probe = new Probe();
-      var test_switch = new Switch();
-      connectPublisherToSubscriber(test_switch, probe);
-      test_switch.setState(true);
-      assert.equal(probe.getState(), true);
-      test_switch.setState(false);
-      assert.equal(probe.getState(), false);
-    })
-  }),
-
-  describe('Test connectPublisherToSubscriber', function() {
-    it('Propagate values when first connected', function() {
       var testSwitch = new Switch();
-      var probe = new Probe();
+      testSwitch.addOutput(probe);
       testSwitch.setState(true);
-      connectPublisherToSubscriber(testSwitch, probe);
       assert.equal(probe.getState(), true);
+      testSwitch.setState(false);
+      assert.equal(probe.getState(), false);
     })
   }),
 
@@ -74,8 +69,8 @@ describe('Core tests', function(){
       testSwitch = new Switch();
       not = new Not();
       probe = new Probe();
-      connectPublisherToSubscriber(testSwitch, not);
-      connectPublisherToSubscriber(not, probe);
+      testSwitch.addOutput(not);
+      not.addOutput(probe);
     }),
 
     it('Init to true', function() {
@@ -105,7 +100,7 @@ describe('Core tests', function(){
       switches.forEach(function(sw) {
         and.addInput(sw);
       });
-      connectPublisherToSubscriber(and, probe);
+      and.addOutput(probe);
     }),
 
     it('Init to false', function() {
@@ -165,7 +160,7 @@ describe('Core tests', function(){
       and2 = new And();
       and2.addInput(and0);
       and2.addInput(and1);
-      connectPublisherToSubscriber(and2, probe);
+      and2.addOutput(probe);
       assert.equal(probe.getState(), false);
       switches.forEach(function(sw) {
         sw.setState(true);
@@ -214,7 +209,7 @@ describe('Core tests', function(){
       switches.forEach(function(sw) {
         or.addInput(sw);
       });
-      connectPublisherToSubscriber(or, probe);
+      or.addOutput(probe);
     }),
 
     it('Init to false', function() {

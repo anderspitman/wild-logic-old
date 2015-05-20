@@ -1,10 +1,16 @@
 var core = require('./core');
 var Rx = require('rx');
+var _ = require('lodash');
+
+WithOutputsMixin = core.WithOutputsMixin;
 
 function Not() {
+  this.outputs = [];
   this.state = false;
   this.subject = new Rx.Subject();
 }
+
+_.extend(Not.prototype, WithOutputsMixin);
 
 Not.prototype.callback = function(state) {
   this.state = !state;
@@ -26,12 +32,7 @@ Gate.prototype.addInput = function(input) {
   callback(input.state);
 }
 
-Gate.prototype.addOutput = function(output) {
-  this.outputs.push(output);
-  var callback = output.callback.bind(output);
-  this.subject.subscribe(callback);
-  callback(this.state);
-}
+_.extend(Gate.prototype, WithOutputsMixin);
 
 Gate.prototype.callback = function(state) {
   this.state = this.evaluate();
