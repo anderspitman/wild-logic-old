@@ -4,6 +4,7 @@ var gates = require("../gates");
 
 Switch = core.Switch;
 Probe = core.Probe;
+verifyGateFromTruthTable = core.verifyGateFromTruthTable;
 
 Not = gates.Not;
 And = gates.And;
@@ -244,6 +245,17 @@ describe('Core tests', function(){
       assert.equal(probe.getState(), true);
     })
 
+  }),
+
+  describe('Logic verifier', function() {
+    it('NOT gate', function() {
+      var truthTable = [ 
+        [[false], true],
+        [[true], false]
+      ];
+
+      assert.equal(verifyGateFromTruthTable(Not, truthTable), true);
+    })
   })
 
 })

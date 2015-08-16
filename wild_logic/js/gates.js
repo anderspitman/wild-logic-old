@@ -15,7 +15,7 @@ _.extend(Not.prototype, WithOutputsMixin);
 Not.prototype.callback = function(state) {
   this.state = !state;
   this.subject.onNext(this.state);
-}
+};
 
 
 function Gate() {
@@ -30,18 +30,18 @@ Gate.prototype.addInput = function(input) {
   var callback = this.callback.bind(this);
   input.subject.subscribe(callback);
   callback(input.state);
-}
+};
 
 _.extend(Gate.prototype, WithOutputsMixin);
 
 Gate.prototype.callback = function(state) {
   this.state = this.evaluate();
   this.subject.onNext(this.state);
-}
+};
 
 Gate.prototype.evaluate = function() {
   throw "Abstract method evaluate not implemented";
-}
+};
 
 
 function And() {
@@ -60,7 +60,7 @@ And.prototype.evaluate = function() {
     }
   });
   return value;
-}
+};
 
 
 function Or() {
@@ -79,7 +79,7 @@ Or.prototype.evaluate = function() {
     }
   });
   return value;
-}
+};
 
 
 module.exports.Not = Not;
